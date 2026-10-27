@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0b12" />
-    <meta name="description" content="JPlayer — a modern, responsive JavaScript music player." />
+    <meta name="description" content="JPlayer — a modern local music player with playlists and folder scanning." />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -16,49 +17,38 @@
     <main class="app-shell">
       <header class="topbar">
         <div class="brand"><span class="brand-mark"><i class="fa-solid fa-waveform"></i></span><span>JPlayer</span></div>
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        <div class="top-actions">
+          <button class="folder-btn" id="pick-folder"><i class="fa-solid fa-folder-open"></i><span>Music Folder</span></button>
+          <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        </div>
       </header>
 
-      <section class="player" id="music-container" aria-label="Music player">
-        <div class="ambient ambient-one"></div>
-        <div class="ambient ambient-two"></div>
-
-        <div class="artwork-wrap">
-          <div class="artwork-shadow"></div>
-          <div class="img-container"><img src="" alt="Album artwork" id="cover" /></div>
-        </div>
-
-        <div class="track-content">
-          <p class="eyebrow"><i class="fa-solid fa-music"></i> NOW PLAYING</p>
-          <h1 id="title">Loading…</h1>
-          <p class="subtitle" id="artist">JPlayer Collection</p>
-
-          <div class="timeline">
-            <div class="time-row"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
-            <div class="progress-container" id="progress-container" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" tabindex="0">
-              <div class="buffer" id="buffer"></div><div class="progress" id="progress"></div><div class="progress-thumb"></div>
-            </div>
+      <section class="workspace" id="workspace">
+        <section class="player" id="music-container" aria-label="Music player">
+          <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+          <div class="artwork-wrap"><div class="artwork-shadow"></div><div class="img-container"><img src="" alt="Album artwork" id="cover" /></div></div>
+          <div class="track-content">
+            <p class="eyebrow"><i class="fa-solid fa-music"></i> NOW PLAYING</p>
+            <h1 id="title">Your Music</h1><p class="subtitle" id="artist">Choose a music folder to get started</p>
+            <div class="timeline"><div class="time-row"><span id="current-time">0:00</span><span id="duration">0:00</span></div><div class="progress-container" id="progress-container" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"><div class="buffer" id="buffer"></div><div class="progress" id="progress"></div><div class="progress-thumb"></div></div></div>
+            <div class="controls"><button class="control-btn" id="shuffle" aria-label="Shuffle" aria-pressed="false"><i class="fa-solid fa-shuffle"></i></button><button class="control-btn" id="prev" aria-label="Previous"><i class="fa-solid fa-backward-step"></i></button><button class="play-btn" id="play" aria-label="Play"><i class="fa-solid fa-play"></i></button><button class="control-btn" id="next" aria-label="Next"><i class="fa-solid fa-forward-step"></i></button><button class="control-btn" id="repeat" aria-label="Repeat" aria-pressed="false"><i class="fa-solid fa-repeat"></i></button></div>
+            <div class="bottom-controls"><button class="icon-btn small" id="mute" aria-label="Mute"><i class="fa-solid fa-volume-high"></i></button><input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" /><button class="speed-btn" id="speed" aria-label="Playback speed">1×</button></div>
           </div>
+        </section>
 
-          <div class="controls">
-            <button class="control-btn" id="shuffle" aria-label="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
-            <button class="control-btn" id="prev" aria-label="Previous"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="play-btn" id="play" aria-label="Play"><i class="fa-solid fa-play"></i></button>
-            <button class="control-btn" id="next" aria-label="Next"><i class="fa-solid fa-forward-step"></i></button>
-            <button class="control-btn" id="repeat" aria-label="Repeat"><i class="fa-solid fa-repeat"></i></button>
-          </div>
-
-          <div class="bottom-controls">
-            <button class="icon-btn small" id="mute" aria-label="Mute"><i class="fa-solid fa-volume-high"></i></button>
-            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume" />
-            <button class="speed-btn" id="speed" aria-label="Playback speed">1×</button>
-          </div>
-        </div>
+        <aside class="playlist-panel" aria-label="Playlist">
+          <div class="playlist-head"><div><span class="panel-kicker">LIBRARY</span><h2>Playlist <span id="track-count">0</span></h2></div><button class="icon-btn small" id="clear-playlist" aria-label="Clear playlist" title="Clear playlist"><i class="fa-solid fa-trash-can"></i></button></div>
+          <div class="drop-zone" id="drop-zone" tabindex="0"><i class="fa-solid fa-cloud-arrow-up"></i><strong>Drop music here</strong><span>or choose a folder</span></div>
+          <div class="playlist" id="playlist"></div>
+        </aside>
       </section>
 
+      <div class="library-status" id="library-status"><i class="fa-solid fa-circle-info"></i> MP3, WAV, OGG, M4A, AAC, FLAC supported where your browser can decode them.</div>
       <footer class="hint"><i class="fa-regular fa-keyboard"></i> Space Play/Pause&nbsp; • &nbsp;←/→ Seek&nbsp; • &nbsp;N Next</footer>
       <audio id="audio" preload="metadata"></audio>
+      <input id="file-input" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac" multiple hidden />
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
